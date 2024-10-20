@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package quickstart;
+
+option go_package = "/models";
+
+// The calc service performs operations on numbers
+service BasicService {
+  // Add implements add.
+  rpc Request(BasicRequest) returns (BasicResponse);
+}
+
+message BasicRequest {
+
+  sint32 force_delay = 1;
+  sint32 force_ret = 2;
+}
+
+message BasicResponse {
+}
