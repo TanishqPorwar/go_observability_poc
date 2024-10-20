@@ -29,18 +29,16 @@ services:
       - --config=/configs/config.yaml
     volumes:
       - ./docker/beyla/:/configs
-    # See the full list of configuration options at
-    # https://grafana.com/docs/grafana-cloud/monitor-applications/beyla/configure/options/ for more details on the
-    # options set below.
+
     environment:
-      BEYLA_OPEN_PORT: "8080,6060"                                   # Instrument any service listening on port 4000.
-      BEYLA_SERVICE_NAMESPACE: "zepto"                       # The namespace for the service.
-      BEYLA_PROMETHEUS_PORT: "9090"                             # The port to expose Prometheus metrics on.
+      BEYLA_OPEN_PORT: "8080,6060"
+      BEYLA_SERVICE_NAMESPACE: "zepto"
+      BEYLA_PROMETHEUS_PORT: "9090"
       #BEYLA_BPF_TRACK_REQUEST_HEADERS: "true"
-      OTEL_SERVICE_NAME: "beyla-go-basic-server"                # The service name to use for OpenTelemetry traces.
-      OTEL_EXPORTER_OTLP_TRACES_INSECURE: "true"                # Whether to use an insecure connection to Grafana Alloy.
-      OTEL_EXPORTER_OTLP_PROTOCOL: "grpc"                       # The protocol to use to send traces to Grafana Alloy.
-      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: "http://alloy:4317"   # The endpoint to send traces to.
+      OTEL_SERVICE_NAME: "beyla-go-basic-server"
+      OTEL_EXPORTER_OTLP_TRACES_INSECURE: "true"
+      OTEL_EXPORTER_OTLP_PROTOCOL: "grpc"
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: "http://alloy:4317"
     depends_on:
       basic_server:
         condition: service_started
@@ -73,18 +71,15 @@ services:
       - --config=/configs/config.yaml
     volumes:
       - ./docker/beyla/:/configs
-    # See the full list of configuration options at
-    # https://grafana.com/docs/grafana-cloud/monitor-applications/beyla/configure/options/ for more details on the
-    # options set below.
     environment:
-      BEYLA_OPEN_PORT: "8081,6061"                                   # Instrument any service listening on port 4000.
-      BEYLA_SERVICE_NAMESPACE: "zepto"                       # The namespace for the service.
-      BEYLA_PROMETHEUS_PORT: "9090"                             # The port to expose Prometheus metrics on.
+      BEYLA_OPEN_PORT: "8081,6061"
+      BEYLA_SERVICE_NAMESPACE: "zepto"
+      BEYLA_PROMETHEUS_PORT: "9090"
       #BEYLA_BPF_TRACK_REQUEST_HEADERS: "true"
-      OTEL_SERVICE_NAME: "beyla-go-requester-server"                # The service name to use for OpenTelemetry traces.
-      OTEL_EXPORTER_OTLP_TRACES_INSECURE: "true"                # Whether to use an insecure connection to Grafana Alloy.
-      OTEL_EXPORTER_OTLP_PROTOCOL: "grpc"                       # The protocol to use to send traces to Grafana Alloy.
-      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: "http://alloy:4317"   # The endpoint to send traces to.
+      OTEL_SERVICE_NAME: "beyla-go-requester-server"
+      OTEL_EXPORTER_OTLP_TRACES_INSECURE: "true"
+      OTEL_EXPORTER_OTLP_PROTOCOL: "grpc"
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: "http://alloy:4317"
     depends_on:
       requester_server:
         condition: service_started
@@ -109,7 +104,6 @@ services:
   grafana:
     image: grafana/grafana:11.2.0
     volumes:
-      #      - "./docker/grafana/definitions:/var/lib/grafana/dashboards"
       - "./docker/grafana/provisioning:/etc/grafana/provisioning"
     ports:
       - "3000:3000"
