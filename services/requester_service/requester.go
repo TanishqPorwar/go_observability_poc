@@ -88,7 +88,11 @@ func handleRequest3(rw http.ResponseWriter, req *http.Request) {
 func main() {
 	log.Println("Listening on http://localhost:8081")
 	go func() {
-		log.Fatal(http.ListenAndServe(":8081", http.HandlerFunc(handleRequest3)))
+		http.HandleFunc("/request", handleRequest3)
+		err := http.ListenAndServe(":8081", nil)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}()
 
 	lis, err := net.Listen("tcp", ":6061")
