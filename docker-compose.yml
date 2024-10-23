@@ -1,8 +1,49 @@
-name: grafana-intro-to-mltp
+name: go_observability_poc
 volumes:
   grafana:
   postgres:
 services:
+
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 2181:2181
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - 9092:9092
+      - 29092:29092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  init-kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - kafka
+    entrypoint: [ '/bin/sh', '-c' ]
+    command: |
+      "
+      # blocks until kafka is reachable
+      kafka-topics --bootstrap-server kafka:9092 --list
+      
+      echo -e 'Creating kafka topics'
+      kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic basic_server --replication-factor 1 --partitions 1
+      
+      echo -e 'Successfully created the following topics:'
+      kafka-topics --bootstrap-server kafka:29092 --list
+      "
 
   basic_server:
     build:
@@ -11,6 +52,11 @@ services:
     ports:
       - "8080:8080"
       - "6060:6060"
+    environment:
+      KAFKA_BROKER_URL: "kafka:9092"
+      KAFKA_TOPIC: "basic_server"
+    depends_on:
+      - kafka
 
   beyla-basic-server:
     image: grafana/beyla:1.8.4
@@ -35,6 +81,7 @@ services:
       BEYLA_SERVICE_NAMESPACE: "zepto"
       BEYLA_PROMETHEUS_PORT: "9090"
       #BEYLA_BPF_TRACK_REQUEST_HEADERS: "true"
+      BEYLA_OTEL_METRICS_INSTRUMENTATIONS: "*"
       OTEL_SERVICE_NAME: "beyla-go-basic-server"
       OTEL_EXPORTER_OTLP_TRACES_INSECURE: "true"
       OTEL_EXPORTER_OTLP_PROTOCOL: "grpc"
